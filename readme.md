@@ -21,7 +21,7 @@ A FastAPI backend for scraping product reviews, analyzing their sentiment, and s
 ### 1. Clone the repository
 
 ```sh
-git clone <your-repo-url>
+git clone <https://github.com/adeelmaheen/backend>
 cd backend
 ```
 
@@ -91,4 +91,4 @@ MIT License
 
 ---
 
-**Note:** Do not commit your `credentials.json` to version control.
+
