@@ -107,35 +107,62 @@ def get_sentiment(text: str) -> tuple:
         logger.error(f"Error analyzing sentiment: {e}")
         return 0.0, "Neutral"
 
+# def setup_google_sheets():
+#     """Setup Google Sheets client"""
+#     try:
+#         # Check for credentials file or environment variable
+#         credentials_file = os.getenv('GOOGLE_CREDENTIALS_FILE', 'credentials.json')
+        
+#         # For deployment, check if credentials are in environment variable
+#         if os.getenv('GOOGLE_CREDENTIALS_JSON'):
+#             import json
+#             credentials_data = json.loads(os.getenv('GOOGLE_CREDENTIALS_JSON'))
+#             credentials = Credentials.from_service_account_info(credentials_data, scopes=[
+#                 'https://spreadsheets.google.com/feeds',
+#                 'https://www.googleapis.com/auth/drive'
+#             ])
+#         elif os.path.exists(credentials_file):
+#             credentials = Credentials.from_service_account_file(credentials_file, scopes=[
+#                 'https://spreadsheets.google.com/feeds',
+#                 'https://www.googleapis.com/auth/drive'
+#             ])
+#         else:
+#             logger.warning(f"Google credentials not found")
+#             return None
+        
+#         # Create client
+#         client = gspread.authorize(credentials)
+        
+#         logger.info("Google Sheets client initialized successfully")
+#         return client
+        
+#     except Exception as e:
+#         logger.error(f"Failed to setup Google Sheets client: {e}")
+#         return None
+
 def setup_google_sheets():
     """Setup Google Sheets client"""
     try:
-        # Check for credentials file or environment variable
+        scopes = [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive'
+        ]
+
         credentials_file = os.getenv('GOOGLE_CREDENTIALS_FILE', 'credentials.json')
-        
-        # For deployment, check if credentials are in environment variable
+
         if os.getenv('GOOGLE_CREDENTIALS_JSON'):
-            import json
             credentials_data = json.loads(os.getenv('GOOGLE_CREDENTIALS_JSON'))
-            credentials = Credentials.from_service_account_info(credentials_data, scopes=[
-                'https://spreadsheets.google.com/feeds',
-                'https://www.googleapis.com/auth/drive'
-            ])
+            credentials = Credentials.from_service_account_info(credentials_data, scopes=scopes)
         elif os.path.exists(credentials_file):
-            credentials = Credentials.from_service_account_file(credentials_file, scopes=[
-                'https://spreadsheets.google.com/feeds',
-                'https://www.googleapis.com/auth/drive'
-            ])
+            credentials = Credentials.from_service_account_file(credentials_file, scopes=scopes)
         else:
-            logger.warning(f"Google credentials not found")
+            logger.warning("Google credentials not found")
             return None
-        
-        # Create client
+
         client = gspread.authorize(credentials)
-        
         logger.info("Google Sheets client initialized successfully")
         return client
-        
+
     except Exception as e:
         logger.error(f"Failed to setup Google Sheets client: {e}")
         return None
@@ -201,7 +228,7 @@ def save_to_google_sheets(data: List[ReviewData]) -> tuple:
                 len(review.review_text),
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             ]
-            rows.append(row)
+            rows.append([str(item) for item in row])
         
         # Write data to sheet
         worksheet.update('A1', rows)
